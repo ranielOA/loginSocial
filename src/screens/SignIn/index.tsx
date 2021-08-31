@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTheme } from 'styled-components';
-import { Fontisto } from '@expo/vector-icons'
+import { Fontisto } from '@expo/vector-icons';
 import { ActivityIndicator, Alert, Modal, View } from 'react-native';
 
 import { useAuth } from '../../hooks/useAuth';
@@ -8,17 +8,17 @@ import { useAuth } from '../../hooks/useAuth';
 import LoginBannerImg from '../../assets/images/login.svg';
 import LogoImg from '../../assets/images/logo.svg';
 
-import { 
+import {
   Container,
   Content,
-  LoginBanner, 
-  LoginInfo, 
-  Header, 
-  Partner, 
-  Description, 
+  LoginBanner,
+  LoginInfo,
+  Header,
+  Partner,
+  Description,
   SignInButton,
   SignInButtonIcon,
-  SignInButtonText 
+  SignInButtonText,
 } from './styles';
 
 export function SignIn() {
@@ -26,14 +26,14 @@ export function SignIn() {
   const theme = useTheme();
 
   // creates a function to handle sign in
-    // try to call and wait signIn
-    // if fails, display an Alert with the title "Erro SignIn" and message "Ocorreu um erro ao tentar logar no app"
+  // try to call and wait signIn
+  // if fails, display an Alert with the title "Erro SignIn" and message "Ocorreu um erro ao tentar logar no app"
 
   async function handleSignIn() {
     try {
-      await signIn()
+      await signIn();
     } catch (error) {
-      Alert.alert("Erro SignIn", "Ocorreu um erro ao tentar logar no app")
+      Alert.alert('Erro SignIn', 'Ocorreu um erro ao tentar logar no app');
     }
   }
 
@@ -65,34 +65,37 @@ export function SignIn() {
 
           <Description>
             Veja dados{'\n'}
-            interessantes sobre{'\n'}
-            o mundo da Twitch
+            interessantes sobre{'\n'}o mundo da Twitch
           </Description>
 
           <SignInButton onPress={handleSignIn}>
             <SignInButtonIcon>
-              {isLoggingIn ? 
-                <ActivityIndicator size={20} color={theme.colors.white} /> : 
-                <Fontisto style={{marginRight: 1}} name="twitch" size={20} color={theme.colors.white} />
-              }
+              {isLoggingIn ? (
+                <ActivityIndicator size={20} color={theme.colors.white} />
+              ) : (
+                <Fontisto
+                  style={{ marginRight: 1 }}
+                  name="twitch"
+                  size={20}
+                  color={theme.colors.white}
+                />
+              )}
             </SignInButtonIcon>
 
             <SignInButtonText>
-              {isLoggingIn ? "Entrando..." : "Entrar com Twitch"}
+              {isLoggingIn ? 'Entrando...' : 'Entrar com Twitch'}
             </SignInButtonText>
           </SignInButton>
         </LoginInfo>
       </Content>
 
-      <Modal 
+      <Modal
         animationType="fade"
         visible={isLoggingIn}
         statusBarTranslucent
         transparent
       >
-        <View
-          style={{ flex: 1, backgroundColor: 'rgba(14, 14, 16, 0.5)' }}
-        />
+        <View style={{ flex: 1, backgroundColor: 'rgba(14, 14, 16, 0.5)' }} />
       </Modal>
     </Container>
   );

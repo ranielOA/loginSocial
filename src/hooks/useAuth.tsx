@@ -1,5 +1,11 @@
 import { makeRedirectUri, revokeAsync, startAsync } from 'expo-auth-session';
-import React, { useEffect, createContext, useContext, useState, ReactNode } from 'react';
+import React, {
+  useEffect,
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+} from 'react';
 import { generateRandom } from 'expo-auth-session/build/PKCE';
 
 import { api } from '../services/api';
@@ -29,7 +35,7 @@ const AuthContext = createContext({} as AuthContextData);
 
 const twitchEndpoints = {
   authorization: 'https://id.twitch.tv/oauth2/authorize',
-  revocation: 'https://id.twitch.tv/oauth2/revoke'
+  revocation: 'https://id.twitch.tv/oauth2/revoke',
 };
 
 function AuthProvider({ children }: AuthProviderData) {
@@ -43,7 +49,7 @@ function AuthProvider({ children }: AuthProviderData) {
   async function signIn() {
     try {
       // set isLoggingIn to true
-      setIsLoggingIn(true)
+      setIsLoggingIn(true);
 
       // REDIRECT_URI - create OAuth redirect URI using makeRedirectUri() with "useProxy" option set to true
       // RESPONSE_TYPE - set to "token"
@@ -51,16 +57,17 @@ function AuthProvider({ children }: AuthProviderData) {
       // FORCE_VERIFY - set to true
       // STATE - generate random 30-length string using generateRandom() with "size" set to 30
 
-      const REDIRECT_URI = makeRedirectUri({useProxy: true})
-      const RESPONSE_TYPE = 'token'
-      const SCOPE = encodeURI('openid user:read:email user:read:follows')
-      const FORCE_VERIFY = true
-      const STATE = generateRandom(30)
+      const REDIRECT_URI = makeRedirectUri({ useProxy: true });
+      const RESPONSE_TYPE = 'token';
+      const SCOPE = encodeURI('openid user:read:email user:read:follows');
+      const FORCE_VERIFY = true;
+      const STATE = generateRandom(30);
 
-      // assemble authUrl with twitchEndpoint authorization, client_id, 
+      // assemble authUrl with twitchEndpoint authorization, client_id,
       // redirect_uri, response_type, scope, force_verify and state
 
-      const authUrl = twitchEndpoints.authorization +
+      const authUrl =
+        twitchEndpoints.authorization +
         `?client_id=${CLIENT_ID}` +
         `&redirect_uri=${REDIRECT_URI}` +
         `&response_type=${RESPONSE_TYPE}` +
@@ -70,40 +77,43 @@ function AuthProvider({ children }: AuthProviderData) {
 
       // call startAsync with authUrl
 
-      const response = await startAsync({authUrl});
+      const response = await startAsync({ authUrl });
 
-      if(response.type === 'success' && response.params.error !== 'access_denied') {
-        if(response.params.state !== STATE) {
-          throw 'Invalid state value'
+      if (
+        response.type === 'success' &&
+        response.params.error !== 'access_denied'
+      ) {
+        if (response.params.state !== STATE) {
+          throw 'Invalid state value';
         }
 
-        api.defaults.headers.authorization = `Bearer ${response.params.access_token}`
+        api.defaults.headers.authorization = `Bearer ${response.params.access_token}`;
 
-        const userResponse = await api.get('/users')
+        const userResponse = await api.get('/users');
 
-        setUser(userResponse.data.data[0])
-        setUserToken(response.params.access_token)
+        setUser(userResponse.data.data[0]);
+        setUserToken(response.params.access_token);
       }
 
       // verify if startAsync response.type equals "success" and response.params.error differs from "access_denied"
       // if true, do the following:
 
-        // verify if startAsync response.params.state differs from STATE
-        // if true, do the following:
-          // throw an error with message "Invalid state value"
+      // verify if startAsync response.params.state differs from STATE
+      // if true, do the following:
+      // throw an error with message "Invalid state value"
 
-        // add access_token to request's authorization header
+      // add access_token to request's authorization header
 
-        // call Twitch API's users route
+      // call Twitch API's users route
 
-        // set user state with response from Twitch API's route "/users"
-        // set userToken state with response's access_token from startAsync
+      // set user state with response from Twitch API's route "/users"
+      // set userToken state with response's access_token from startAsync
     } catch (error) {
-      console.log(error)
-      throw error
+      console.log(error);
+      throw error;
       // throw an error
     } finally {
-      setIsLoggingIn(false)
+      setIsLoggingIn(false);
       // set isLoggingIn to false
     }
   }
@@ -111,12 +121,15 @@ function AuthProvider({ children }: AuthProviderData) {
   async function signOut() {
     try {
       // set isLoggingOut to true
-      setIsLoggingOut(true)
+      setIsLoggingOut(true);
 
       // call revokeAsync with access_token, client_id and twitchEndpoint revocation
-      revokeAsync({token: userToken, clientId: CLIENT_ID}, {revocationEndpoint: twitchEndpoints.revocation})
+      revokeAsync(
+        { token: userToken, clientId: CLIENT_ID },
+        { revocationEndpoint: twitchEndpoints.revocation }
+      );
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
       // set user state to an empty User object
       // set userToken state to an empty string
@@ -125,23 +138,25 @@ function AuthProvider({ children }: AuthProviderData) {
 
       // set isLoggingOut to false
 
-      setUser({} as User)
-      setUserToken("")
+      setUser({} as User);
+      setUserToken('');
       delete api.defaults.headers.authorization;
-      setIsLoggingOut(false)
+      setIsLoggingOut(false);
     }
   }
 
   useEffect(() => {
     // add client_id to request's "Client-Id" header
-    api.defaults.headers['Client-Id'] = CLIENT_ID
-  }, [])
+    api.defaults.headers['Client-Id'] = CLIENT_ID;
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoggingOut, isLoggingIn, signIn, signOut }}>
-      { children }
+    <AuthContext.Provider
+      value={{ user, isLoggingOut, isLoggingIn, signIn, signOut }}
+    >
+      {children}
     </AuthContext.Provider>
-  )
+  );
 }
 
 function useAuth() {
